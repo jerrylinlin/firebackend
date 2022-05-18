@@ -1,7 +1,6 @@
 package common
 
 import (
-	"firebackend/model"
 	"firebackend/utils"
 	"fmt"
 	"github.com/jinzhu/gorm"
@@ -16,6 +15,5 @@ func MysqlInit() *gorm.DB {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	db.AutoMigrate(&model.UserReg{})
 	return db
 }

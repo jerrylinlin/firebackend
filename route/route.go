@@ -25,14 +25,10 @@ func RoutRegister() *gin.Engine {
 				"message": "pong",
 			})
 		})
-		V.GET("/hello", func(c *gin.Context) {
-			c.JSON(200, gin.H{
-				"message": "hello",
-			})
-		})
+		V.GET("/user/info", controllers.UserInfo)
 	}
 	{
-		V.POST("/login", controllers.LoginUser)
+		V.POST("/user/login", controllers.LoginUser)
 		V.POST("/register", controllers.UserReg)
 		V.POST("/logout", func(cox *gin.Context) {
 			cox.JSON(200, gin.H{
