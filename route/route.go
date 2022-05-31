@@ -30,11 +30,11 @@ func RoutRegister() *gin.Engine {
 	{
 		V.POST("/user/login", controllers.LoginUser)
 		V.POST("/register", controllers.UserReg)
-		V.POST("/logout", func(cox *gin.Context) {
-			cox.JSON(200, gin.H{
-				"message": "logout",
-			})
-		})
+		V.POST("/user/logout", controllers.LogOut)
+		V.POST("/host/list", controllers.ItList)
+		V.POST("/host/save", controllers.ItSave)
+		V.POST("/host/edit", controllers.ItEdit)
+		V.POST("/host/del", controllers.ItDel)
 	}
 	return R
 }

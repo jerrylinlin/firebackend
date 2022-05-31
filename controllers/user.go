@@ -8,7 +8,14 @@ import (
 
 func LoginUser(cox *gin.Context) {
 	json := make(map[string]string)
-	cox.BindJSON(&json)
+	err := cox.BindJSON(&json)
+	if err != nil {
+		cox.JSON(200, gin.H{
+			"code":    20001,
+			"message": "登录失败",
+		})
+		return
+	}
 	user := string(json["username"])
 	pwd := string(json["password"])
 	if len(user) == 0 || len(pwd) == 0 {
@@ -23,18 +30,22 @@ func LoginUser(cox *gin.Context) {
 	var login model.LoginUser
 	db.AutoMigrate(&login)
 	db.Where("user_name = ?", user).First(&login)
+	token := map[string]string{
+		"token":   "default",
+		"message": "登录成功",
+	}
 	if login.UserName == user && login.Password == pwd {
 		cox.JSON(200, gin.H{
-			"code":    20000,
-			"status":  "succeed",
-			"message": "登录成功",
+			"code":   20000,
+			"status": "succeed",
+			"data":   token,
 		})
 		return
 	} else {
 		cox.JSON(200, gin.H{
 			"code":    20001,
 			"status":  "failed",
-			"message": "用户名或密码不对请注册",
+			"message": "用户名或密码错误请重新输入",
 		})
 		return
 	}
