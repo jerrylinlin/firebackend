@@ -2,13 +2,15 @@ package controllers
 
 import (
 	"firebackend/common"
+	"firebackend/middleware"
 	"firebackend/model"
+	"fmt"
 	"github.com/gin-gonic/gin"
 )
 
 func LoginUser(cox *gin.Context) {
-	json := make(map[string]string)
-	err := cox.BindJSON(&json)
+	var feuser model.LoginUser
+	err := cox.BindJSON(&feuser)
 	if err != nil {
 		cox.JSON(200, gin.H{
 			"code":    20001,
@@ -16,9 +18,7 @@ func LoginUser(cox *gin.Context) {
 		})
 		return
 	}
-	user := string(json["username"])
-	pwd := string(json["password"])
-	if len(user) == 0 || len(pwd) == 0 {
+	if len(feuser.UserName) == 0 || len(feuser.Password) == 0 {
 		cox.JSON(200, gin.H{
 			"code":    20001,
 			"status":  "error",
@@ -29,12 +29,18 @@ func LoginUser(cox *gin.Context) {
 	db := common.MysqlInit()
 	var login model.LoginUser
 	db.AutoMigrate(&login)
-	db.Where("user_name = ?", user).First(&login)
+	db.Where("user_name = ?", feuser.UserName).First(&login)
+	tokenstring, err := middleware.GenerateToken(login)
+	if err != nil {
+		fmt.Println("token生成失败")
+		return
+	}
+	fmt.Println(tokenstring)
 	token := map[string]string{
-		"token":   "default",
+		"token":   tokenstring,
 		"message": "登录成功",
 	}
-	if login.UserName == user && login.Password == pwd {
+	if feuser.UserName == login.UserName && feuser.Password == login.Password {
 		cox.JSON(200, gin.H{
 			"code":   20000,
 			"status": "succeed",
